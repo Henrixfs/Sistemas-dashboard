@@ -1,21 +1,21 @@
 ## 1. Preparación y estructura del proyecto
 
-- [ ] 1.1 Crear repositorio con estructura de monorepo: `frontend/`, `backend/`, `database/`, `docker/`, `docs/`
-- [ ] 1.2 Inicializar proyecto backend con framework web (carpetas: `routes/`, `controllers/`, `services/`, `models/`, `middleware/`, `utils/`)
-- [ ] 1.3 Inicializar proyecto frontend con estructura de componentes (`components/`, `pages/`, `services/`, `styles/`)
-- [ ] 1.4 Configurar archivos de entorno (`.env.example`, `.env.development`, `.env.production`) con variables para BD, sesión, almacenamiento
-- [ ] 1.5 Configurar linters y formateadores (ESLint, Prettier para frontend; estilo equivalente para backend)
-- [ ] 1.6 Configurar gestor de dependencias (`package.json` con scripts dev, build, test, lint)
-- [ ] 1.7 Crear `README.md` con instrucciones de setup, variables de entorno y comandos disponibles
+- [x] 1.1 Crear repositorio con estructura de monorepo: `frontend/`, `backend/`, `database/`, `docker/`, `docs/`
+- [x] 1.2 Inicializar proyecto backend con framework web (carpetas: `routes/`, `controllers/`, `services/`, `models/`, `middleware/`, `utils/`)
+- [x] 1.3 Inicializar proyecto frontend con estructura de componentes (`components/`, `pages/`, `services/`, `styles/`)
+- [x] 1.4 Configurar archivos de entorno (`.env.example`, `.env.development`, `.env.production`) con variables para BD, sesión, almacenamiento
+- [x] 1.5 Configurar linters y formateadores (ESLint, Prettier para frontend; estilo equivalente para backend)
+- [x] 1.6 Configurar gestor de dependencias (`package.json` con scripts dev, build, test, lint)
+- [x] 1.7 Crear `README.md` con instrucciones de setup, variables de entorno y comandos disponibles
 
 ## 2. Infraestructura local y Docker
 
-- [ ] 2.1 Crear `docker-compose.yml` con servicios: app backend, base de datos PostgreSQL, adminer/pgadmin opcional
-- [ ] 2.2 Crear `Dockerfile` para backend (multi-stage: build + producción)
-- [ ] 2.3 Crear `Dockerfile` para frontend (servidor nginx para SPA en producción)
+- [x] 2.1 Crear `docker-compose.yml` con servicios: app backend, base de datos PostgreSQL, adminer/pgadmin opcional
+- [x] 2.2 Crear `Dockerfile` para backend (multi-stage: build + producción)
+- [x] 2.3 Crear `Dockerfile` para frontend (servidor nginx para SPA en producción)
 - [ ] 2.4 Crear script `docker/init-db.sql` con schema inicial de tablas
-- [ ] 2.5 Configurar volúmenes Docker para persistencia de datos y archivos de comprobantes
-- [ ] 2.6 Agregar script `scripts/setup-dev.sh` o `scripts/setup-dev.ps1` para entorno local sin Docker
+- [x] 2.5 Configurar volúmenes Docker para persistencia de datos y archivos de comprobantes
+- [x] 2.6 Agregar script `scripts/setup-dev.sh` o `scripts/setup-dev.ps1` para entorno local sin Docker
 
 ## 3. Base de datos y migraciones
 

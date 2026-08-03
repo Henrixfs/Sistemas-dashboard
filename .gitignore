@@ -1,0 +1,37 @@
+dist/
+coverage/
+*.pyc
+.ruff_cache/
+*.log
+
+
+# Environment
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# Keep templates
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+
+# Python
+backend/.venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+frontend/node_modules/
+
+# Build
+.next/
+frontend/.next/
+frontend/out/
+dist/

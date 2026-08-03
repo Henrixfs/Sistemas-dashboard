@@ -1,0 +1,11 @@
+.git
+backend/.venv
+storage
+**/__pycache__
+**/.next
+frontend/out
+**/node_modules
+coverage
+.env
+.env.*
+!.env.example

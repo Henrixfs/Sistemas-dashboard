@@ -1,0 +1,9 @@
+.agent/
+.codex/
+.opencode/
+openspec/
+node_modules/
+dist/
+frontend/out/
+coverage/
+.env*

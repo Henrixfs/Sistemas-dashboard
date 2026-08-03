@@ -1,0 +1,63 @@
+services:
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-epis_transparente}
+      POSTGRES_USER: ${POSTGRES_USER:-epis_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-epis_local_development_password}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - epis_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      API_PORT: 8000
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "${API_PORT:-8000}:8000"
+    healthcheck:
+      test:
+        ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - voucher_storage:/var/lib/epis-transparente/vouchers
+    networks:
+      - epis_network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    networks:
+      - epis_network
+
+volumes:
+  postgres_data:
+  voucher_storage:
+
+networks:
+  epis_network:
+    driver: bridge
