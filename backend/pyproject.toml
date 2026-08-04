@@ -28,6 +28,7 @@ include = ["app*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+python_files = ["test_*.py", "*_postgres.py"]
 
 [tool.ruff]
 target-version = "py312"

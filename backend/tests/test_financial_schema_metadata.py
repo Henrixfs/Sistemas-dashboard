@@ -68,5 +68,5 @@ def test_initial_alembic_revision_is_the_only_head() -> None:
     config = Config(str(backend_dir / "alembic.ini"))
     script = ScriptDirectory.from_config(config)
 
-    assert script.get_heads() == ["2e6e98d8c631"]
-    assert script.get_revision("2e6e98d8c631").down_revision is None
+    assert script.get_heads() == ["8b53d93b4fc1"]
+    assert script.get_revision("8b53d93b4fc1").down_revision == "2e6e98d8c631"
