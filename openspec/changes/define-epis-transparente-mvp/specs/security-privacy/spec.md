@@ -47,12 +47,12 @@ El sistema SHALL implementar protección contra CSRF, XSS e inyección SQL.
 - **Then** el sistema rechaza la solicitud y muestra un error de validación
 
 ### Requirement: SEC-SP-05 — Datos personales mínimos
-El sistema SHALL solicitar y almacenar únicamente los datos personales estrictamente necesarios para la operación: nombres, apellidos, correo electrónico y código de estudiante.
+El sistema SHALL solicitar y almacenar únicamente los datos personales estrictamente necesarios para la operación: nombres, apellidos y código de estudiante para alumnos importados; el correo electrónico será opcional para alumnos y obligatorio como identificador de administradores y superadministradores.
 
 #### Scenario: Verificación de datos solicitados en registro
 - **Given** un alumno en la página de registro
 - **When** revisa los campos del formulario
-- **Then** los únicos campos personales solicitados son: nombres, apellidos, correo electrónico institucional y código de estudiante
+- **Then** los únicos campos personales solicitados son los requeridos por su rol: para alumno, nombres, apellidos y código de estudiante; para cuenta administrativa, nombres, apellidos y correo electrónico
 
 ### Requirement: NFR-SP-01 — Tiempo de respuesta de autenticación
 El proceso de inicio de sesión SHALL completarse en un tiempo máximo de 2 segundos en condiciones normales.
@@ -61,3 +61,11 @@ El proceso de inicio de sesión SHALL completarse en un tiempo máximo de 2 segu
 - **Given** un usuario con credenciales válidas
 - **When** hace clic en "Iniciar sesión"
 - **Then** el sistema autentica y redirige al usuario en menos de 2 segundos
+
+### Requirement: SEC-SP-06 — Protección de credenciales temporales y datos de importación
+El sistema MUST generar `password_hash` inmediatamente al importar una cuenta o restablecer acceso. El DNI, las contraseñas temporales y las contraseñas nuevas MUST NOT almacenarse en texto plano ni registrarse en auditoría, logs o resúmenes de importación.
+
+#### Scenario: Importación con DNI temporal
+- **Given** una fila válida de alumno con DNI para establecer la contraseña temporal inicial
+- **When** el sistema importa la cuenta
+- **Then** genera solamente el hash de contraseña, establece `must_change_password=true` y no registra el DNI ni la contraseña

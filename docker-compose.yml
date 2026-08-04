@@ -20,6 +20,7 @@ services:
       context: .
       dockerfile: docker/backend.Dockerfile
     environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-epis_user}:${POSTGRES_PASSWORD:-epis_local_development_password}@database:5432/${POSTGRES_DB:-epis_transparente}
       ENVIRONMENT: ${ENVIRONMENT:-development}
       API_PORT: 8000
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}

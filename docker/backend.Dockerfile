@@ -6,6 +6,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /build
 COPY backend/pyproject.toml ./pyproject.toml
 COPY backend/app ./app
+COPY backend/alembic ./alembic
+COPY backend/alembic.ini ./alembic.ini
 RUN python -m venv /opt/venv \
     && /opt/venv/bin/pip install --no-cache-dir --upgrade pip \
     && /opt/venv/bin/pip install --no-cache-dir .
@@ -20,6 +22,8 @@ RUN addgroup --system app && adduser --system --ingroup app app
 WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 COPY backend/app ./app
+COPY backend/alembic ./alembic
+COPY backend/alembic.ini ./alembic.ini
 RUN mkdir -p /var/lib/epis-transparente/vouchers \
     && chown -R app:app /app /var/lib/epis-transparente
 

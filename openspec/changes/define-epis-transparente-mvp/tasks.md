@@ -13,37 +13,47 @@
 - [x] 2.1 Crear `docker-compose.yml` con servicios: app backend, base de datos PostgreSQL, adminer/pgadmin opcional
 - [x] 2.2 Crear `Dockerfile` para backend (multi-stage: build + producción)
 - [x] 2.3 Crear `Dockerfile` para frontend (servidor nginx para SPA en producción)
-- [ ] 2.4 Crear script `docker/init-db.sql` con schema inicial de tablas
+- [x] 2.4 Mantener PostgreSQL sin un esquema financiero paralelo: Alembic será la única fuente de verdad para crear y evolucionar las tablas de negocio mediante `alembic upgrade head`; no crear `docker/init-db.sql` si no se requiere inicialización estructural adicional y, si existiera, no deberá crear tablas de negocio
 - [x] 2.5 Configurar volúmenes Docker para persistencia de datos y archivos de comprobantes
 - [x] 2.6 Agregar script `scripts/setup-dev.sh` o `scripts/setup-dev.ps1` para entorno local sin Docker
 
 ## 3. Base de datos y migraciones
 
-- [ ] 3.1 Crear migración inicial con tabla `users` (id, email, password_hash, nombres, apellidos, codigo_estudiante, rol, activo, created_at, updated_at) — FR-UA-01, FR-UA-03, BR-UA-01
-- [ ] 3.2 Crear migración con tabla `financial_periods` (id, nombre, año, fecha_inicio, fecha_fin, estado, created_at, updated_at) — FR-FP-01, FR-FP-03
-- [ ] 3.3 Crear migración con tabla `categories` (id, nombre, descripcion, activa, created_at, updated_at) — FR-CM-01, FR-CM-03
-- [ ] 3.4 Crear migración con tabla `movements` (id, periodo_id, tipo [ingreso/gasto], categoria_id, descripcion, monto, proveedor, estado [borrador/publicado/anulado], fecha_movimiento, justificacion_anulacion, anulado_por, anulado_en, created_at, updated_at) — FR-IR-01, FR-ER-01, BR-MC-02
-- [ ] 3.5 Crear migración con tabla `vouchers` (id, movement_id, nombre_archivo, ruta_archivo, tipo_mime, tamaño, visible, reemplazo_de, motivo_reemplazo, created_at) — FR-VA-01, FR-VA-03, BR-VA-01
-- [ ] 3.6 Crear migración con tabla `correction_history` (id, movement_id, campo, valor_anterior, valor_nuevo, usuario_id, created_at) — FR-MC-01
-- [ ] 3.7 Crear migración con tabla `audit_log` (id, usuario_id, tipo_operacion, entidad_tipo, entidad_id, detalle, direccion_ip, created_at) — FR-AL-01, BR-AL-01, BR-AL-02
-- [ ] 3.8 Crear migración con tabla `sessions` (id, usuario_id, token, expires_at, created_at) — SEC-UA-01
-- [ ] 3.9 Agregar índices en columnas de búsqueda frecuente: movements.periodo_id, movements.estado, movements.fecha_movimiento, audit_log.created_at, audit_log.tipo_operacion — NFR-SQ-01
+- [x] 3.1 Crear migración inicial con tabla `users` (id UUID PK, codigo_estudiante obligatorio para alumno y único cuando no sea NULL; email opcional para alumno y obligatorio, único normalizado/case-insensitive para administrador/superadministrador; password_hash, nombres, apellidos, rol TEXT/VARCHAR con CHECK: alumno/administrador/superadministrador, activo, must_change_password, created_by cuando corresponda, created_at, updated_at); no fijar aún un DEFAULT de activación — FR-UA-01, FR-UA-03, BR-UA-01
+- [x] 3.2 Crear migración con tabla `financial_periods` (id, nombre, año, fecha_inicio, fecha_fin, estado TEXT/VARCHAR con CHECK: abierto/cerrado, closed_by, closed_at, created_at, updated_at) y CHECK `fecha_inicio < fecha_fin`; un periodo cerrado será de solo lectura respecto de sus datos financieros — FR-FP-01, FR-FP-03, BR-FP-01, BR-FP-02
+- [x] 3.3 Crear migración con tabla `categories` (id, nombre único, descripcion, activa, created_at, updated_at) con desactivación lógica y sin eliminación destructiva de categorías con historial financiero — FR-CM-01, FR-CM-03, BR-CM-01
+- [x] 3.4 Crear migración con tabla `movements` (id, periodo_id, tipo TEXT/VARCHAR con CHECK: ingreso/gasto, categoria_id, fuente obligatoria para ingresos conforme a FR-IR-01, descripcion, monto NUMERIC(14,2) con CHECK `monto > 0`, proveedor, estado TEXT/VARCHAR con CHECK: borrador/publicado/anulado, fecha_movimiento, created_by, updated_by, published_by, published_at, justificacion_anulacion, annulled_by, annulled_at, reemplaza_movimiento_id, created_at, updated_at); publicado exige metadata de publicación, anulado exige justificación y metadata de anulación, y `reemplaza_movimiento_id` rastrea original → reemplazo — FR-IR-01, FR-ER-01, FR-DW-02, BR-MC-02
+- [x] 3.5 Crear migración con tabla `vouchers` (id, movement_id, nombre_archivo, ruta_logica, tipo_mime, tamaño, visible, replaces_voucher_id, motivo_reemplazo, uploaded_by, replaced_by, replaced_at, sha256, created_at), conservando el comprobante anterior al reemplazarlo — FR-VA-01, FR-VA-03, BR-VA-01, BR-VA-02
+- [x] 3.6 Crear migración con tabla `correction_history` (id, movement_id, campo, valor_anterior JSONB, valor_nuevo JSONB, usuario_id, motivo opcional, created_at) — FR-MC-01
+- [x] 3.7 Crear migración con tabla `audit_log` (id, usuario_id, tipo_operacion, entidad_tipo, entidad_id, detalle JSONB, direccion_ip INET, created_at) y planificar protección a nivel de BD contra UPDATE y DELETE — FR-AL-01, BR-AL-01, BR-AL-02
+- [x] 3.8 Crear migración con tabla `sessions` (id, usuario_id, token_hash, last_activity_at, expires_at, revoked_at, created_at); el token real nunca se almacenará en texto plano — SEC-UA-01
+- [x] 3.9 Agregar únicamente los índices no redundantes: unicidad case-insensitive de `users.email`; unicidad parcial de `users.codigo_estudiante` cuando no sea NULL; `movements(periodo_id, estado, tipo, fecha_movimiento)` y `movements(categoria_id)`; `vouchers(movement_id)`; `correction_history(movement_id, created_at)`; `audit_log(usuario_id, created_at)`, `audit_log(tipo_operacion, created_at)` y `audit_log(entidad_tipo, entidad_id, created_at)`; `sessions(usuario_id)`, `sessions(expires_at)` y unicidad de `sessions.token_hash` — NFR-SQ-01
+- [ ] 3.10 Implementar constraints declarativos: PRIMARY KEY, NOT NULL, UNIQUE, CHECK de fechas, monto, tipos, estados y coherencia de metadata de publicación/anulación; el saldo no se almacena — FR-FP-01, FR-IR-01, FR-ER-01, FR-DW-02, FR-MC-02
+- [ ] 3.11 Implementar FOREIGN KEY con políticas `ON DELETE` no destructivas para movimientos, comprobantes, correcciones y auditoría; no usar `ON DELETE CASCADE` sobre historial financiero — BR-IR-01, BR-ER-01, BR-VA-01, BR-AL-01
+- [ ] 3.12 Implementar triggers de BD estrictamente necesarios para impedir DELETE de movimientos publicados o anulados, impedir modificación financiera de periodos cerrados e impedir UPDATE o DELETE de `audit_log` — BR-FP-02, BR-IR-01, BR-ER-01, BR-AL-01
+- [ ] 3.13 Implementar validación transaccional al publicar: un gasto debe tener al menos un comprobante válido asociado; un ingreso puede publicarse sin comprobante — FR-DW-02, BR-ER-02, BR-IR-02
+- [ ] 3.14 Crear pruebas de integración de restricciones de BD: monto y valores de estado/tipo, metadata de publicación/anulación, protección de periodo cerrado, borrado de movimientos, inmutabilidad de auditoría, FKs no destructivas y publicación de gasto sin comprobante — FR-DW-02, BR-FP-02, BR-AL-01
 
 ## 4. Autenticación y control de acceso
 
-- [ ] 4.1 Implementar endpoint `POST /api/auth/register` para registro de alumnos (nombres, apellidos, correo, código, contraseña) — FR-UA-03
-- [ ] 4.2 Implementar endpoint `POST /api/auth/login` que valida credenciales, crea sesión y devuelve cookie HttpOnly — FR-UA-01, SEC-UA-01
-- [ ] 4.3 Implementar endpoint `POST /api/auth/logout` que destruye la sesión activa — FR-UA-02
+- [ ] 4.1 Implementar importación administrativa de alumnos desde Excel institucional, sin autoregistro público — FR-UA-03
+- [ ] 4.2 Implementar inicio de sesión que autentica al alumno mediante `codigo_estudiante` y al administrador/superadministrador mediante email, crea sesión y devuelve cookie HttpOnly — FR-UA-01, SEC-UA-01
+- [ ] 4.3 Implementar endpoint `POST /api/auth/logout` que revoca la sesión activa y elimina la cookie HttpOnly — FR-UA-02, SEC-UA-01
 - [ ] 4.4 Implementar endpoint `GET /api/auth/me` que devuelve datos del usuario autenticado según su sesión — BR-UA-01
 - [ ] 4.5 Implementar middleware `requireAuth` que verifica cookie de sesión válida en cada request protegido — SEC-UA-01
 - [ ] 4.6 Implementar middleware `requireRole('admin')` que verifica que el usuario autenticado sea administrador — SEC-SP-02
 - [ ] 4.7 Implementar expiración automática de sesión por inactividad (tiempo configurable vía env) — SEC-UA-01
 - [ ] 4.8 Implementar hash de contraseñas con bcrypt antes de almacenar — SEC-SP-01
 - [ ] 4.9 Implementar frontend: página de inicio de sesión con formulario y validación — FR-UA-01
-- [ ] 4.10 Implementar frontend: página de registro de alumno con formulario y validación — FR-UA-03
+- [ ] 4.10 Implementar frontend: pantalla administrativa de importación de alumnos con resumen de creados, omitidos y errores — FR-UA-03
 - [ ] 4.11 Implementar frontend: navbar con información de usuario autenticado y botón de cerrar sesión — FR-UA-02
 - [ ] 4.12 Implementar frontend: guardia de rutas que redirige a login si no hay sesión válida — SEC-UA-01
-- [ ] 4.13 Implementar frontend: redirección por rol (admin a panel de gestión, alumno a dashboard) — BR-UA-01, SEC-SP-02
+- [ ] 4.13 Implementar frontend: redirección por rol (superadministrador/administrador a panel de gestión, alumno a dashboard) — BR-UA-01, SEC-SP-02
+- [ ] 4.14 Implementar validación e importación futura desde Excel institucional: validar filas, códigos duplicados, DNI faltante o inválido según la regla que se defina, no duplicar alumnos, crear `password_hash` desde la contraseña temporal inicial, establecer `must_change_password=true` y producir resumen de creados, omitidos y errores sin registrar DNI ni contraseñas — FR-UA-03, SEC-SP-06
+- [ ] 4.15 Implementar cambio obligatorio de contraseña después del primer inicio de sesión correcto cuando `must_change_password=true`; al completarlo, establecer el valor en false — FR-UA-04, SEC-SP-06
+- [ ] 4.16 Implementar restablecimiento administrativo de acceso con mecanismo temporal seguro, sin persistir contraseña temporal en texto plano, estableciendo `must_change_password=true` y registrando el evento sin secreto — FR-UA-05, SEC-SP-06, FR-AL-01
+- [ ] 4.17 Implementar bootstrap seguro del superadministrador mediante mecanismo no versionado, sin credenciales hardcodeadas — FR-UA-06, SEC-SP-06
+- [ ] 4.18 Implementar creación, activación, desactivación y restablecimiento de administradores solo por superadministrador; un administrador no crea superadministradores — FR-UA-07, BR-UA-02
 
 ## 5. Periodos financieros
 

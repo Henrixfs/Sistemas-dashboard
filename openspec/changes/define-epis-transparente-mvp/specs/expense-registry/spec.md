@@ -48,3 +48,16 @@ El sistema MUST impedir la eliminación física de un gasto publicado. Cuando se
 - **Given** un administrador autenticado y un gasto en estado publicado
 - **When** intenta eliminar el gasto
 - **Then** el sistema deniega la operación e indica que los movimientos publicados no pueden eliminarse, solo anularse
+
+### Requirement: BR-ER-02 — Gasto publicado requiere comprobante válido
+Un gasto en estado borrador SHALL poder existir sin comprobante. El sistema MUST impedir que un gasto pase a estado publicado si no tiene al menos un comprobante válido asociado conforme a FR-VA-01; la validación SHALL ejecutarse al intentar publicarlo.
+
+#### Scenario: Guardar gasto sin comprobante como borrador
+- **Given** un administrador autenticado y un periodo abierto
+- **When** registra un gasto sin adjuntar comprobante y lo guarda como borrador
+- **Then** el sistema crea el gasto en estado borrador
+
+#### Scenario: Publicar gasto con comprobante válido
+- **Given** un administrador autenticado y un gasto en estado borrador con al menos un comprobante válido asociado
+- **When** intenta publicar el movimiento
+- **Then** el sistema publica el gasto

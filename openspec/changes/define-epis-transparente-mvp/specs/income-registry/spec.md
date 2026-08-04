@@ -45,3 +45,11 @@ El sistema MUST impedir la eliminación física de un ingreso publicado. Cuando 
 - **Given** un administrador autenticado y un ingreso en estado publicado
 - **When** intenta eliminar el ingreso
 - **Then** el sistema deniega la operación e indica que los movimientos publicados no pueden eliminarse, solo anularse
+
+### Requirement: BR-IR-02 — Ingreso publicado no requiere comprobante
+Un ingreso en estado borrador SHALL poder existir sin comprobante y el sistema SHALL permitir publicarlo sin comprobante; la ausencia de comprobante no bloquea su publicación.
+
+#### Scenario: Publicar ingreso sin comprobante
+- **Given** un administrador autenticado y un ingreso en estado borrador sin comprobante adjunto
+- **When** intenta publicar el movimiento
+- **Then** el sistema publica el ingreso

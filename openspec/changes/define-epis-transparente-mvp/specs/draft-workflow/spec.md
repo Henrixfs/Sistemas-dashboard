@@ -13,17 +13,22 @@ El administrador SHALL poder guardar un movimiento (ingreso o gasto) como borrad
 - **Then** el sistema crea el movimiento en estado borrador y no es visible para los alumnos
 
 ### Requirement: FR-DW-02 — Publicar movimiento
-El administrador SHALL poder publicar un movimiento en estado borrador. Al publicarse, el movimiento se vuelve visible para los alumnos en el dashboard.
+El administrador SHALL poder publicar un movimiento en estado borrador. Al publicarse, el movimiento se vuelve visible para los alumnos en el dashboard. Un ingreso puede publicarse sin comprobante. Un gasto SHALL tener al menos un comprobante válido asociado conforme a FR-VA-01 antes de pasar a publicado; esta validación ocurre al intentar publicar, no al guardar el borrador.
 
 #### Scenario: Publicación exitosa de movimiento
 - **Given** un administrador autenticado y un movimiento en estado borrador con todos los campos obligatorios completos
 - **When** selecciona publicar el movimiento y confirma la acción
 - **Then** el sistema cambia el estado del movimiento a "publicado", registra la fecha y hora de publicación, y el movimiento aparece en el dashboard del alumno
 
-#### Scenario: Publicación de movimiento sin comprobante obligatorio
-- **Given** un administrador autenticado y un movimiento en estado borrador sin comprobante adjunto
+#### Scenario: Publicación de ingreso sin comprobante
+- **Given** un administrador autenticado y un ingreso en estado borrador sin comprobante adjunto
 - **When** intenta publicar el movimiento
-- **Then** el sistema permite la publicación (el comprobante no es obligatorio para publicar)
+- **Then** el sistema permite la publicación
+
+#### Scenario: Publicación de gasto sin comprobante válido
+- **Given** un administrador autenticado y un gasto en estado borrador sin comprobante válido asociado
+- **When** intenta publicar el movimiento
+- **Then** el sistema rechaza la publicación e indica que el gasto requiere al menos un comprobante válido
 
 ### Requirement: FR-DW-03 — Listar movimientos por estado
 El administrador SHALL poder filtrar los movimientos por estado (borrador, publicado, anulado) dentro de un periodo seleccionado.

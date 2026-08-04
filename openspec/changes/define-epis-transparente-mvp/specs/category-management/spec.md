@@ -45,3 +45,11 @@ El sistema SHALL mostrar al administrador la lista de categorías activas e inac
 - **Given** un administrador autenticado y categorías activas e inactivas
 - **When** accede a la sección de categorías
 - **Then** el sistema muestra todas las categorías, indicando cuáles están activas y cuáles inactivas
+
+### Requirement: BR-CM-01 — Conservación de categorías con historial
+El sistema MUST impedir la eliminación destructiva de una categoría con movimientos financieros asociados. La categoría SHALL desactivarse para impedir su selección en nuevos gastos y conservará las referencias históricas existentes.
+
+#### Scenario: Intento de eliminar una categoría con historial
+- **Given** un administrador autenticado y una categoría asociada a gastos existentes
+- **When** intenta eliminar la categoría
+- **Then** el sistema rechaza la eliminación destructiva y permite únicamente su desactivación

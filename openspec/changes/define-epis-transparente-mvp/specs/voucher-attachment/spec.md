@@ -50,3 +50,11 @@ Al reemplazar un comprobante, el archivo original SHALL conservarse en el sistem
 - **Given** un administrador que reemplazó un comprobante con motivo registrado
 - **When** se consulta el historial de comprobantes del movimiento
 - **Then** el sistema muestra tanto el comprobante original como el reemplazo, cada uno con su fecha y motivo asociado
+
+### Requirement: BR-VA-02 — Conservación y validez de comprobantes
+El sistema SHALL conservar los comprobantes asociados a un movimiento como historial y no eliminará físicamente el comprobante anterior al ser reemplazado. Un comprobante válido para publicación SHALL ser un archivo asociado al movimiento y aceptado conforme a los formatos permitidos por FR-VA-01.
+
+#### Scenario: Reemplazo sin eliminación del comprobante anterior
+- **Given** un administrador autenticado y un comprobante asociado a un gasto
+- **When** adjunta un comprobante de reemplazo con motivo válido
+- **Then** el sistema conserva el comprobante anterior, registra la relación de reemplazo y mantiene el nuevo comprobante asociado al movimiento

@@ -55,3 +55,11 @@ Un periodo financiero cerrado SHALL permanecer en estado cerrado y no podrá rea
 - **Given** un administrador autenticado y un periodo en estado cerrado
 - **When** intenta reabrir el periodo
 - **Then** el sistema deniega la operación e indica que los periodos cerrados no pueden reabrirse
+
+### Requirement: BR-FP-02 — Periodo cerrado de solo lectura
+Un periodo financiero cerrado SHALL ser de solo lectura respecto de sus datos financieros asociados. El sistema MUST impedir crear, modificar o eliminar movimientos, comprobantes y correcciones vinculados a dicho periodo.
+
+#### Scenario: Intento de modificar un movimiento de periodo cerrado
+- **Given** un administrador autenticado y un periodo cerrado con un movimiento asociado
+- **When** intenta modificar, anular o adjuntar un comprobante al movimiento
+- **Then** el sistema rechaza la operación e indica que el periodo está cerrado y es de solo lectura
